@@ -36,7 +36,10 @@ typedef NS_ENUM(NSUInteger, RASwipeTableViewCellMode)
 
 @interface RASwipeTableViewCell : UITableViewCell
 {
-	NSArray *_contentViewContainer; 
+	NSArray *_contentViewContainer;
+	
+	UISwipeGestureRecognizer *_swipeRightToLeftGestureRecognizer;
+	UISwipeGestureRecognizer *_swipeLeftToRightGestureRecognizer;
 }
 
 @property (nonatomic, assign) id<RASwipeTableViewCellDelegate> delegate;

@@ -1,10 +1,12 @@
+////////////////////////////////////////////////////////////
 //
-//  main.m
+//	main.m
 //  RASwipe Demo
 //
 //  Created by ऑस्कर लकड़ा on 9/8/13.
 //  Copyright (c) 2013 Vertinic Inc. All rights reserved.
 //
+////////////////////////////////////////////////////////////
 
 #import <UIKit/UIKit.h>
 
@@ -12,6 +14,7 @@
 
 int main(int argc, char *argv[])
 {
+	//com.vertinic.RASwipe-Demo
 	@autoreleasepool {
 	    return UIApplicationMain(argc, argv, nil, NSStringFromClass([RAAppDelegate class]));
 	}

@@ -26,7 +26,7 @@
 {
 	self = [super initWithStyle:style];
 	if( self ) {
-		self->_contentItems = 1;
+		self->_contentItems = 5;
 	}
 	return self;
 }
