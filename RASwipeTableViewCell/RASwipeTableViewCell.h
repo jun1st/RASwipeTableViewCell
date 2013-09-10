@@ -46,4 +46,10 @@ typedef NS_ENUM(NSUInteger, RASwipeTableViewCellMode)
 
 @property (nonatomic, assign) RASwipeTableViewCellMode mode;
 
+@property (nonatomic, assign) CGFloat offset;
+
+@property (nonatomic, assign) CGFloat duration;
+
+@property (nonatomic) UISwipeGestureRecognizerDirection direction;
+
 @end

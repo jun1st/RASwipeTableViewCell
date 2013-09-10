@@ -28,6 +28,13 @@
 {
 	self.mode = RASwipeTableViewCellPrimaryMode;
 	
+	CGRect frame = self.contentView.frame;
+	self.offset = CGRectGetWidth(frame) * 0.10;
+	
+	self.direction = UISwipeGestureRecognizerDirectionRight|UISwipeGestureRecognizerDirectionLeft;
+	
+	self.duration = 0.4f;
+	
 	if(!_contentViewContainer) {
 		CGRect frame = self.contentView.frame;
 		_contentViewContainer = [NSArray arrayWithObjects:
@@ -77,13 +84,10 @@
 	self.mode = RASwipeTableViewCellSecondaryMode;
 	
 	if(_contentViewContainer && [_contentViewContainer count] == 2) {
-		CGRect frame = self.contentView.frame;
-		CGFloat leftOffset = CGRectGetWidth(frame) * 0.10;
-			
 		UIView *primaryView = [_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryMode];
 		
-		[UIView animateWithDuration:1.0 animations:^{
-			primaryView.frame = CGRectMake(0, 0, leftOffset, CGRectGetHeight(frame));
+		[UIView animateWithDuration:self.duration animations:^{
+			primaryView.frame = CGRectMake(0, 0, self.offset, CGRectGetHeight(self.contentView.frame));
 		}];
 	}
 }
@@ -138,6 +142,13 @@
 	
 	for(UIView *_view in _contentViewContainer)
 		_view.frame = frame;
+	
+	/* Update gesture registeration */
+	if(self.direction == UISwipeGestureRecognizerDirectionRight) {
+		[self removeGestureRecognizer:_swipeLeftToRightGestureRecognizer];
+	} else if(self.direction == UISwipeGestureRecognizerDirectionLeft) {
+		[self removeGestureRecognizer:_swipeRightToLeftGestureRecognizer];
+	}
 }
 
 #pragma mark - UIGestureRecognizerDelegate methods

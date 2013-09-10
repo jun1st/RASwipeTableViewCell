@@ -69,9 +69,24 @@
 	if(!cell) {
 		cell = [[RASwipeTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 	}
+	
+	switch (indexPath.row) {
+		case 0:
+			cell.direction = UISwipeGestureRecognizerDirectionLeft;
+			break;
+			
+		case 1:
+			cell.direction = UISwipeGestureRecognizerDirectionRight;
+			break;
+			
+		default:
+			cell.direction = UISwipeGestureRecognizerDirectionRight | UISwipeGestureRecognizerDirectionLeft;
+			break;
+	}
+	
 
 	[cell.contentView setBackgroundColor:[UIColor whiteColor]];
-	[cell setSelectionStyle:UITableViewCellSelectionStyleGray];
+	[cell setSelectionStyle:UITableViewCellSelectionStyleBlue];
 
 	return cell;
 }
