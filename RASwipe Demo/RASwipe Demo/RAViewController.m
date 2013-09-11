@@ -72,15 +72,18 @@
 	
 	switch (indexPath.row) {
 		case 0:
-			cell.direction = UISwipeGestureRecognizerDirectionLeft;
+			cell.direction = UISwipeGestureRecognizerDirectionRight;
+			cell.offset = CGRectGetWidth(cell.frame) * 0.50;
 			break;
 			
 		case 1:
 			cell.direction = UISwipeGestureRecognizerDirectionRight;
+			cell.offset = CGRectGetWidth(cell.frame) * 0.50;
 			break;
 			
-		default:
-			cell.direction = UISwipeGestureRecognizerDirectionRight | UISwipeGestureRecognizerDirectionLeft;
+		case 2:
+			cell.direction = UISwipeGestureRecognizerDirectionLeft;
+			cell.offset = CGRectGetWidth(cell.frame) * 0.50;
 			break;
 	}
 	

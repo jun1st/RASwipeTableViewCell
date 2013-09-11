@@ -12,39 +12,38 @@
 
 @class RASwipeTableViewCell;
 
-typedef NS_ENUM(NSUInteger, RASwipeTableViewCellDirection)
+typedef NS_ENUM(NSUInteger, RASwipeTableViewCellContent)
 {
-	RASwipeTableViewCellDirectionLeft = 0,
-	RASwipeTableViewCellDirectionRight
+	RASwipeTableViewCellPrimaryContent = 0,
+	RASwipeTableViewCellSecondaryContent = 1
 };
 
-typedef NS_ENUM(NSUInteger, RASwipeTableViewCellMode)
+typedef NS_ENUM(NSUInteger, RASwipeTableViewCellDrawer)
 {
-	RASwipeTableViewCellPrimaryMode = 0,
-	RASwipeTableViewCellSecondaryMode
+	RASwipeTableViewCellDrawerOpen = 0,
+	RASwipeTableViewCellDrawerClosed
 };
 
 @protocol RASwipeTableViewCellDelegate <NSObject>
-
 @optional
-
-- (void)swipeTableViewCell:(RASwipeTableViewCell *)cell withMode:(RASwipeTableViewCellMode)mode;
-
-- (void)swipeTableViewCell:(RASwipeTableViewCell *)cell withMode:(RASwipeTableViewCellMode)mode forDirection:(RASwipeTableViewCellDirection)direction;
 
 @end
 
 @interface RASwipeTableViewCell : UITableViewCell
 {
+	@protected
 	NSArray *_contentViewContainer;
+	UISwipeGestureRecognizerDirection _previousDirection;
 	
-	UISwipeGestureRecognizer *_swipeRightToLeftGestureRecognizer;
-	UISwipeGestureRecognizer *_swipeLeftToRightGestureRecognizer;
+	@private
+	UIPanGestureRecognizer *_panGestureRecognizer;
+	UISwipeGestureRecognizer *_leftSwipeGestureRecognizer;
+	UISwipeGestureRecognizer *_rightSwipeGestureRecognizer;
 }
 
 @property (nonatomic, assign) id<RASwipeTableViewCellDelegate> delegate;
 
-@property (nonatomic, assign) RASwipeTableViewCellMode mode;
+@property (nonatomic, assign) RASwipeTableViewCellDrawer drawer;
 
 @property (nonatomic, assign) CGFloat offset;
 
