@@ -1,4 +1,10 @@
 RASwipeTableViewCell
 ====================
 
-Inspired by the "Twitter.app" the aim is to create an extended UITableViewCell that would allow for two content views on the same table cell. Using the right-to-left swipe the second content view will be displayed.
+The RASwipeTableViewCell contains three view containers: 
+
+Primary - This container is visible by default. 
+
+Secondary - This container is visible when the user slides from right to left.
+
+Ternary - This container is visible when the user slides from left to right. 
