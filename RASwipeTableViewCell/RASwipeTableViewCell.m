@@ -15,8 +15,8 @@
 - (void)initialize;
 
 // Handle Gestures
-- (void)handleTowardsLeftSwipeGestureRecognizer: (UISwipeGestureRecognizer *)gesture;
-- (void)handleTowardsRightSwipeGestureRecognizer: (UISwipeGestureRecognizer *)gesture;
+- (void)handleTowardsLeftPanGestureRecognizer: (UIPanGestureRecognizer *)gesture;
+- (void)handleTowardsRightPanGestureRecognizer: (UIPanGestureRecognizer *)gesture;
 - (void)handlePanGestureRecognizer: (UIPanGestureRecognizer *)gesture;
 
 @end
@@ -111,21 +111,34 @@
 		_contentViewContainer = [NSArray arrayWithObjects:
 								 [[UIView alloc] initWithFrame:frame],
 								 [[UIView alloc] initWithFrame:frame],
+								 [[UIView alloc] initWithFrame:frame],
 								 nil];
-	}
-	NSUInteger idx = 0;
-	for(UIView *_view in _contentViewContainer) {
-		_view.tag = idx++;
-		_view.clipsToBounds = YES;
-		_view.opaque = YES;
-		if (_view.tag == 0) {
-			_view.backgroundColor = [UIColor lightGrayColor];
-		} else {
-			_view.backgroundColor = [UIColor darkGrayColor];
+		NSUInteger idx = 0;
+		for(UIView *_view in _contentViewContainer) {
+			_view.tag = idx++;
+			_view.clipsToBounds = YES;
+			_view.hidden = YES;
+			switch (_view.tag) {
+				case RASwipeTableViewCellPrimaryContent:
+					_view.backgroundColor = [UIColor lightGrayColor];
+					_view.hidden = NO;
+					break;
+					
+				case RASwipeTableViewCellSecondaryContent:
+					_view.backgroundColor = [UIColor redColor];
+					break;
+					
+				case RASwipeTableViewCellTernaryContent:
+					_view.backgroundColor = [UIColor yellowColor];
+					break;
+			}
 		}
-		[self.contentView addSubview:_view];
 	}
-	[self.contentView bringSubviewToFront:(UIView *)[_contentViewContainer objectAtIndex:0]];
+		
+	for(UIView *_view in _contentViewContainer)
+		[self.contentView addSubview:_view];
+	
+	[self.contentView bringSubviewToFront:(UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent]];
 	
 	if(!_panGestureRecognizer) {
 		_panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureRecognizer:)];
@@ -136,64 +149,126 @@
 
 - (void)handlePanGestureRecognizer: (UIPanGestureRecognizer *)gesture
 {
-	CGPoint point = [gesture velocityInView:self];
-	if(point.x > 0) {
-		NSLog(@"swiped towards right");
-	} else {
-		NSLog(@"swiped towards left");
+	UIGestureRecognizerState state = gesture.state;
+	
+	if(state == UIGestureRecognizerStateBegan || state == UIGestureRecognizerStateChanged) {
+		_isDragging = YES;
+	}
+	
+	else if(state == UIGestureRecognizerStateEnded || state == UIGestureRecognizerStateCancelled) {
+		_isDragging = NO;
+		
+		CGPoint velocity = [gesture velocityInView:self];
+		if(velocity.x > 0) {
+			[self handleTowardsRightPanGestureRecognizer:gesture];
+		} else {
+			[self handleTowardsLeftPanGestureRecognizer:gesture];
+		}
 	}
 }
 
-- (void)handleTowardsLeftSwipeGestureRecognizer: (UISwipeGestureRecognizer *)gesture
+- (void)handleTowardsLeftPanGestureRecognizer: (UIPanGestureRecognizer *)gesture
 {
 	if(_drawer == RASwipeTableViewCellDrawerClosed) {
-		_previousDirection = UISwipeGestureRecognizerDirectionLeft;
+		_drawer = RASwipeTableViewCellDrawerOpen;
+		_previousDirection = RASwipeTableViewCellDirectionToLeft;
 		
-		[UIView animateWithDuration:_duration animations:^{
-			UIView *primaryView = [_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent];
-			primaryView.frame = CGRectMake(0.0 - _offset, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame));
+		UIView *_secondaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellSecondaryContent];
+		CGRect frame = self.contentView.frame;
+		_secondaryView.frame = CGRectMake(CGRectGetWidth(frame), frame.origin.y, frame.size.width, frame.size.height);
+		_secondaryView.hidden = NO;
+		
+		[UIView animateWithDuration:0.5f animations:^{
+			CGRect primaryFrame = self.contentView.frame;
+			primaryFrame.origin.x -= _offset;
+			
+			UIView *primaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent];
+			primaryView.frame = primaryFrame;
+			
+			CGRect secondaryFrame = self.contentView.frame;
+			secondaryFrame.origin.x = _offset;
+			UIView *secondaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellSecondaryContent];
+			secondaryView.frame = secondaryFrame;
+			
 		} completion:^(BOOL finished) {
 			NSLog(@"open drawer towards left");
-			_drawer = RASwipeTableViewCellDrawerOpen;
 		}];
+	}
+	else if(_drawer == RASwipeTableViewCellDrawerOpen
+			&& _previousDirection != RASwipeTableViewCellDirectionToLeft) {
 		
-	} else {
-		if(_previousDirection == UISwipeGestureRecognizerDirectionRight) {
-			[UIView animateWithDuration:_duration animations:^{
-				UIView *primaryView = [_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent];
-				primaryView.frame = CGRectMake(0.0, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame));
-			} completion:^(BOOL finished) {
-				NSLog(@"close drawer towards left");
-				_drawer = RASwipeTableViewCellDrawerClosed;
-			}];
-		}
+		_drawer = RASwipeTableViewCellDrawerClosed;
+		
+		[UIView animateWithDuration:0.5f animations:^{
+			CGRect primaryFrame = self.contentView.frame;
+			
+			UIView *primaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent];
+			primaryView.frame = primaryFrame;
+			
+			UIView *ternaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellSecondaryContent];
+			
+			CGRect ternaryFrame = ternaryView.frame;
+			ternaryFrame.origin.x -= _offset;
+			
+			ternaryView.frame = ternaryFrame;
+			
+		} completion:^(BOOL finished) {
+			UIView *ternaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellTernaryContent];
+			ternaryView.hidden = NO;
+			
+			NSLog(@"close drawer towards left");
+		}];
 	}
 }
 
-- (void)handleTowardsRightSwipeGestureRecognizer: (UISwipeGestureRecognizer *)gesture
+- (void)handleTowardsRightPanGestureRecognizer: (UIPanGestureRecognizer *)gesture
 {
 	if(_drawer == RASwipeTableViewCellDrawerClosed) {
-		_previousDirection = UISwipeGestureRecognizerDirectionRight;
+		_drawer = RASwipeTableViewCellDrawerOpen;
+		_previousDirection = RASwipeTableViewCellDirectionToRight;
 		
-		[UIView animateWithDuration:_duration animations:^{
-			UIView *primaryView = [_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent];
-			primaryView.frame = CGRectMake(_offset, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame));
+		UIView *_ternaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellTernaryContent];
+		CGRect frame = self.contentView.frame;
+		_ternaryView.frame = CGRectMake(CGRectGetWidth(frame) * -1.0f, frame.origin.y, frame.size.width, frame.size.height);
+		_ternaryView.hidden = NO;
+		
+		[UIView animateWithDuration:0.5f animations:^{
+			CGRect primaryFrame = self.contentView.frame;
+			primaryFrame.origin.x += _offset;
+			
+			UIView *primaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent];
+			primaryView.frame = primaryFrame;
+			
+			UIView *ternaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellTernaryContent];
+			ternaryView.frame = self.contentView.frame;
+			
 		} completion:^(BOOL finished) {
 			NSLog(@"open drawer towards right");
-			_drawer = RASwipeTableViewCellDrawerOpen;
 		}];
+	}
+	else if(_drawer == RASwipeTableViewCellDrawerOpen
+			 && _previousDirection != RASwipeTableViewCellDirectionToRight) {
 		
-	} else {
-		if(_previousDirection == UISwipeGestureRecognizerDirectionLeft) {
-			[UIView animateWithDuration:_duration animations:^{
-				UIView *primaryView = [_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent];
-				primaryView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame));
-			} completion:^(BOOL finished) {
-				NSLog(@"close drawer towards right");
-				_drawer = RASwipeTableViewCellDrawerClosed;
-			}];
-		}
+		_drawer = RASwipeTableViewCellDrawerClosed;
 		
+		[UIView animateWithDuration:0.5f animations:^{
+			CGRect primaryFrame = self.contentView.frame;
+			UIView *primaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellPrimaryContent];
+			primaryView.frame = primaryFrame;
+			
+			UIView *secondaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellSecondaryContent];
+			
+			CGRect secondaryFrame = secondaryView.frame;
+			secondaryFrame.origin.x = CGRectGetWidth(self.contentView.frame);
+			
+			secondaryView.frame = secondaryFrame;
+			
+		} completion:^(BOOL finished) {
+			UIView *secondaryView = (UIView *)[_contentViewContainer objectAtIndex:RASwipeTableViewCellSecondaryContent];
+			secondaryView.hidden = NO;
+			
+			NSLog(@"close drawer towards right");
+		}];
 	}
 }
 

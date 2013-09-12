@@ -15,13 +15,21 @@
 typedef NS_ENUM(NSUInteger, RASwipeTableViewCellContent)
 {
 	RASwipeTableViewCellPrimaryContent = 0,
-	RASwipeTableViewCellSecondaryContent = 1
+	RASwipeTableViewCellSecondaryContent,
+	RASwipeTableViewCellTernaryContent
 };
 
 typedef NS_ENUM(NSUInteger, RASwipeTableViewCellDrawer)
 {
 	RASwipeTableViewCellDrawerOpen = 0,
 	RASwipeTableViewCellDrawerClosed
+};
+
+typedef NS_ENUM(NSUInteger, RASwipeTableViewCellDirection)
+{
+	RASwipeTableViewCellDirectionToLeft = 0,
+	RASwipeTableViewCellDirectionToRight,
+	RASwipeTableViewCellDirectionToCenter
 };
 
 @protocol RASwipeTableViewCellDelegate <NSObject>
@@ -33,7 +41,7 @@ typedef NS_ENUM(NSUInteger, RASwipeTableViewCellDrawer)
 {
 	@protected
 	NSArray *_contentViewContainer;
-	UISwipeGestureRecognizerDirection _previousDirection;
+	RASwipeTableViewCellDirection _previousDirection;
 	
 	@private
 	UIPanGestureRecognizer *_panGestureRecognizer;
@@ -43,12 +51,14 @@ typedef NS_ENUM(NSUInteger, RASwipeTableViewCellDrawer)
 
 @property (nonatomic, assign) id<RASwipeTableViewCellDelegate> delegate;
 
-@property (nonatomic, assign) RASwipeTableViewCellDrawer drawer;
-
 @property (nonatomic, assign) CGFloat offset;
 
 @property (nonatomic, assign) CGFloat duration;
 
-@property (nonatomic) UISwipeGestureRecognizerDirection direction;
+@property (nonatomic, assign) RASwipeTableViewCellDirection direction;
+
+@property (nonatomic, readonly) RASwipeTableViewCellDrawer drawer;
+
+@property (nonatomic, readonly) BOOL isDragging;
 
 @end

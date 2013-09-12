@@ -72,7 +72,7 @@
 	
 	switch (indexPath.row) {
 		case 0:
-			cell.direction = UISwipeGestureRecognizerDirectionRight;
+			cell.direction = (UISwipeGestureRecognizerDirectionLeft|UISwipeGestureRecognizerDirectionRight);
 			cell.offset = CGRectGetWidth(cell.frame) * 0.50;
 			break;
 			
@@ -108,6 +108,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+	NSLog(@"cell tapped");
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
